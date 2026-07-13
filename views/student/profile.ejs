@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/student-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Profile</h1>
+    <div class="page-sub">Student ID <%= student.id %></div>
+
+    <% if (message) { %><div class="readonly-note"><%= message %></div><% } %>
+    <% if (error) { %><div class="error-msg"><%= error %></div><% } %>
+
+    <div class="panel">
+      <h3>My Photo</h3>
+      <% if (student.photoUrl) { %>
+        <img src="<%= student.photoUrl %>" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:14px;display:block;">
+      <% } %>
+      <form method="POST" action="/student/profile/photo" enctype="multipart/form-data">
+        <input type="file" name="photo" accept="image/*" required style="display:inline-block;width:auto;">
+        <button class="btn btn-primary" style="width:auto;margin-top:0;" type="submit">Upload Photo</button>
+      </form>
+    </div>
+
+    <div class="panel">
+  <h3>Notifications</h3>
+  <p style="color:var(--muted); margin-bottom:12px;">Get notified instantly when your fees or attendance are updated.</p>
+  <button id="enable-push-btn" class="btn btn-primary" style="width:auto;" onclick="enablePushNotifications()">
+    Enable Notifications
+  </button>
+</div>
+
+<script src="/js/push-subscribe.js"></script>
+
+    <div class="panel">
+      <h3>Account Details</h3>
+      <table>
+        <tr><th>Name</th><td><%= student.name %></td></tr>
+        <tr><th>Class</th><td><%= student.class %><%= student.section ? ' — ' + student.section : '' %></td></tr>
+        <tr><th>Roll</th><td><%= student.roll %></td></tr>
+        <tr><th>Phone</th><td><%= student.phone || '—' %></td></tr>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>Change Password</h3>
+      <form method="POST" action="/student/profile/change-password">
+        <div class="form-row">
+          <div class="field"><label>Current Password</label><input type="password" name="currentPassword" required></div>
+          <div class="field"><label>New Password</label><input type="password" name="newPassword" required></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Update Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body></html>

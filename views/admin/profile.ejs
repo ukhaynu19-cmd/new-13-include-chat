@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Profile</h1>
+    <div class="page-sub">Admin account: <%= db.admin.username %></div>
+
+    <% if (message) { %><div class="readonly-note"><%= message %></div><% } %>
+    <% if (error) { %><div class="error-msg"><%= error %></div><% } %>
+
+    <div class="panel">
+      <h3>Change Password</h3>
+      <form method="POST" action="/admin/profile/change-password">
+        <div class="form-row">
+          <div class="field"><label>Current Password</label><input type="password" name="currentPassword" required></div>
+          <div class="field"><label>New Password</label><input type="password" name="newPassword" required></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Update Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body></html>

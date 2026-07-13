@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "admin123"
+  },
+  "classes": [
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten"
+  ],
+  "classSections": {
+    "Six": [],
+    "Seven": [],
+    "Eight": [],
+    "Nine": [
+      "Science",
+      "Business Studies",
+      "Humanities"
+    ],
+    "Ten": [
+      "Science",
+      "Business Studies",
+      "Humanities"
+    ]
+  },
+  "teachers": [
+    {
+      "id": "T001",
+      "name": "Mr. Karim",
+      "password": "teacher123",
+      "subjects": [
+        "Bangla"
+      ],
+      "phone": "01800000001",
+      "photoUrl": ""
+    },
+    {
+      "id": "T002",
+      "name": "Mr. Rahman",
+      "password": "teacher123",
+      "subjects": [
+        "Math"
+      ],
+      "phone": "01800000002",
+      "photoUrl": ""
+    },
+    {
+      "id": "T003",
+      "name": "Ms. Sultana",
+      "password": "teacher123",
+      "subjects": [
+        "English"
+      ],
+      "phone": "01800000003",
+      "photoUrl": ""
+    }
+  ],
+  "students": [],
+  "attendance": [],
+  "routines": [],
+  "examRoutines": [],
+  "results": [],
+  "fees": []
+}

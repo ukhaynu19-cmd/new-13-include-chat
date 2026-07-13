@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Schedule</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/teacher-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Schedule</h1>
+    <div class="page-sub"><%= teacher.name %> — Subjects: <%= teacher.subjects.join(', ') || '—' %></div>
+
+    <div class="panel">
+      <% if (schedule.length === 0) { %>
+        <p style="color:var(--muted)">No classes assigned yet.</p>
+      <% } else { %>
+      <table>
+        <tr><th>Day</th><th>Period</th><th>Time</th><th>Class</th><th>Section</th><th>Subject</th></tr>
+        <% schedule.forEach(s => { %>
+        <tr><td><%= s.day %></td><td><%= s.period %></td><td><%= s.time %></td><td><%= s.class %></td><td><%= s.section %></td><td><%= s.subject %></td></tr>
+        <% }) %>
+      </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+</body></html>

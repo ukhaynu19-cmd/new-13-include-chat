@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Dashboard</h1>
+    <div class="page-sub">Overview of the school — classes 6 to 10</div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Total Students</div><div class="value"><%= db.students.length %></div></div>
+      <div class="stat-card"><div class="label">Classes</div><div class="value"><%= db.classes.length %></div></div>
+      <div class="stat-card"><div class="label">Fees Due</div><div class="value clay"><%= db.fees.filter(f=>f.status==='Due').length %></div></div>
+      <div class="stat-card"><div class="label">Upcoming Exams</div><div class="value gold"><%= db.examRoutines.length %></div></div>
+    </div>
+
+    <div class="panel">
+      <h3>Students by Class</h3>
+      <table>
+        <tr><th>Class</th><th>Students</th></tr>
+        <% db.classes.forEach(c => { %>
+        <tr><td><%= c %></td><td><%= db.students.filter(s=>s.class===c).length %></td></tr>
+        <% }) %>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>Recent Attendance Entries</h3>
+      <table>
+        <tr><th>Student ID</th><th>Date</th><th>Status</th></tr>
+        <% db.attendance.slice(-8).reverse().forEach(a => { %>
+        <tr>
+          <td><%= a.studentId %></td><td><%= a.date %></td>
+          <td><span class="badge badge-<%= a.status==='Present'?'present':(a.status==='Absent'?'absent':'none') %>"><%= a.status %></span></td>
+        </tr>
+        <% }) %>
+      </table>
+    </div>
+
+    <div class="panel" style="border-color:#e6c9c0;">
+      <h3 style="color:var(--danger);">Danger Zone</h3>
+      <p style="color:var(--muted); font-size:0.85rem;">This permanently removes all students, attendance, routines, exams, results, and fees, so you can start fresh with your own data. Your admin login and class/section list stay unchanged.</p>
+      <form method="POST" action="/admin/reset" onsubmit="return confirm('This will permanently delete ALL students, attendance, routines, exams, results, and fees. This cannot be undone. Continue?')">
+        <button class="btn btn-danger" style="width:auto;" type="submit">Clear All Sample Data</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body></html>
