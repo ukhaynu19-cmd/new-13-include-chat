@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Schedule</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/teacher-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Schedule</h1>
+    <div class="page-sub"><%= teacher.name %> — Subjects: <%= teacher.subjects.join(', ') || '—' %></div>
+
+    <div class="panel">
+      <% if (schedule.length === 0) { %>
+        <p style="color:var(--muted)">No classes assigned yet.</p>
+      <% } else { %>
+        <input
+          type="text"
+          id="schedule-search"
+          placeholder="Search subject, class, or section..."
+          style="width:100%;padding:10px;margin-bottom:14px;border-radius:8px;border:1px solid #ccc;font-size:1rem;"
+        >
+        <table id="schedule-table">
+          <tr><th>Day</th><th>Period</th><th>Time</th><th>Class</th><th>Section</th><th>Subject</th></tr>
+          <% schedule.forEach(s => { %>
+          <tr>
+            <td><%= s.day %></td>
+            <td><%= s.period %></td>
+            <td><%= s.time %></td>
+            <td><%= s.class %></td>
+            <td><%= s.section %></td>
+            <td><%= s.subject %></td>
+          </tr>
+          <% }) %>
+        </table>
+        <p id="no-results" style="display:none;color:var(--muted);margin-top:10px;">No matching classes found.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+  const searchInput = document.getElementById('schedule-search');
+  if (searchInput) {
+    const rows = Array.from(document.querySelectorAll('#schedule-table tr')).slice(1);
+    const noResults = document.getElementById('no-results');
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+      rows.forEach(row => {
+        const cls = row.children[3].textContent.toLowerCase();
+        const section = row.children[4].textContent.toLowerCase();
+        const subject = row.children[5].textContent.toLowerCase();
+        const match = !q || cls.includes(q) || section.includes(q) || subject.includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      noResults.style.display = visibleCount === 0 ? '' : 'none';
+    });
+  }
+</script>
+</body></html>
