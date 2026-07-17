@@ -1,0 +1,12 @@
+<div class="sidebar">
+  <div class="brand">Hill Academic Care<span class="role-tag">Teacher</span></div>
+  <a class="nav-link <%= page==='dashboard'?'active':'' %>" href="/teacher">📊 Dashboard</a>
+  <a class="nav-link <%= page==='schedule'?'active':'' %>" href="/teacher/schedule">🗓️ My Schedule</a>
+  <a class="nav-link <%= page==='attendance'?'active':'' %>" href="/teacher/attendance">✅ Take Attendance</a>
+  <a class="nav-link <%= page==='profile'?'active':'' %>" href="/teacher/profile">🔑 My Profile</a>
+  <div class="nav-spacer"></div>
+  <a href="/teacher/chat">💬 Live Chat</a>
+  <a href="/teacher/messages">✉️ Messages</a>
+  <a href="<%= whatsappLink %>" target="_blank" rel="noopener" class="sidebar-whatsapp">💬 WhatsApp Support</a>
+  <a class="nav-link logout-link" href="/logout">↩️ Logout</a>
+</div>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Mark Attendance</h1>
+    <div class="page-sub">Select class, section and date, then mark each student</div>
+
+    <div class="panel">
+      <form method="GET" action="/admin/attendance" class="form-row inline-form">
+        <div class="field"><label>Class</label>
+          <select name="class" onchange="this.form.submit()">
+            <% db.classes.forEach(c=>{ %><option value="<%=c%>" <%= c===selectedClass?'selected':'' %>><%=c%></option><% }) %>
+          </select>
+        </div>
+        <div class="field"><label>Section / Group</label>
+          <% if (availableSections.length === 0) { %>
+            <select name="section" onchange="this.form.submit()" disabled>
+              <option value="">No group (Class <%= selectedClass %>)</option>
+            </select>
+            <input type="hidden" name="section" value="">
+          <% } else { %>
+            <select name="section" onchange="this.form.submit()">
+              <% availableSections.forEach(s=>{ %><option value="<%=s%>" <%= s===selectedSection?'selected':'' %>><%=s%></option><% }) %>
+            </select>
+          <% } %>
+        </div>
+        <div class="field"><label>Date</label>
+          <input type="date" name="date" value="<%= date %>" onchange="this.form.submit()">
+        </div>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3><%= selectedClass %><%= selectedSection ? ' — ' + selectedSection : '' %> — <%= date %></h3>
+      <% if (students.length === 0) { %>
+        <p style="color:var(--muted)">No students in this class/section yet. Add students first.</p>
+      <% } else { %>
+
+      <form id="attendanceSaveForm" method="POST" action="/admin/attendance/save">
+        <input type="hidden" name="date" value="<%= date %>">
+        <input type="hidden" name="class" value="<%= selectedClass %>">
+        <input type="hidden" name="section" value="<%= selectedSection %>">
+      </form>
+
+      <table>
+        <tr><th>ID</th><th>Name</th><th>Roll</th><th>Status</th><th></th></tr>
+        <% students.forEach(s => { const rec = existing[s.id]; %>
+        <tr>
+          <td><%= s.id %></td><td><%= s.name %></td><td><%= s.roll %></td>
+          <% if (rec) { %>
+            <td>
+              <span class="edit-status-<%= rec.id %>">
+                <span class="badge badge-<%= rec.status==='Present'?'present':'absent' %>"><%= rec.status %></span>
+              </span>
+              <form class="edit-form-<%= rec.id %>" method="POST" action="/admin/attendance/edit/<%= rec.id %>" style="display:none;gap:6px;align-items:center;">
+                <input type="hidden" name="date" value="<%= date %>">
+                <input type="hidden" name="class" value="<%= selectedClass %>">
+                <input type="hidden" name="section" value="<%= selectedSection %>">
+                <select name="status">
+                  <option value="Present" <%= rec.status==='Present'?'selected':'' %>>Present</option>
+                  <option value="Absent" <%= rec.status==='Absent'?'selected':'' %>>Absent</option>
+                </select>
+                <button class="btn btn-primary" style="padding:5px 10px;font-size:0.75rem;" type="submit">Save</button>
+              </form>
+            </td>
+            <td>
+              <button type="button" class="btn btn-secondary edit-btn-<%= rec.id %>" style="padding:5px 10px;font-size:0.75rem;"
+                onclick="document.querySelector('.edit-status-<%= rec.id %>').style.display='none'; document.querySelector('.edit-form-<%= rec.id %>').style.display='flex'; document.querySelector('.edit-btn-<%= rec.id %>').style.display='none';">
+                Edit
+              </button>
+            </td>
+          <% } else { %>
+            <td>
+              <input type="hidden" name="studentIds" form="attendanceSaveForm" value="<%= s.id %>">
+              <select name="statuses" form="attendanceSaveForm">
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+              </select>
+            </td>
+            <td></td>
+          <% } %>
+        </tr>
+        <% }) %>
+      </table>
+
+      <button class="btn btn-primary" style="width:auto;margin-top:16px;" type="submit" form="attendanceSaveForm">Save Attendance</button>
+
+      <% } %>
+    </div>
+  </div>
+</div>
+</body></html>

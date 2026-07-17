@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Edit Student</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Edit Student</h1>
+    <div class="page-sub">Student ID <%= student.id %> (ID cannot be changed)</div>
+
+    <div class="panel">
+      <% if (student.photoUrl) { %>
+        <img src="<%= student.photoUrl %>" style="width:70px;height:70px;border-radius:50%;object-fit:cover;margin-bottom:16px;">
+      <% } %>
+      <form method="POST" action="/admin/students/edit/<%= student.id %>" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="field"><label>Full Name</label><input name="name" value="<%= student.name %>" required></div>
+          <div class="field"><label>Class</label>
+            <select name="class" id="edit-class"><% db.classes.forEach(c=>{ %><option <%= c===student.class?'selected':'' %>><%=c%></option><% }) %></select>
+          </div>
+          <div class="field"><label>Section / Group</label>
+            <select name="section" id="edit-section"></select>
+          </div>
+          <div class="field"><label>Roll</label><input name="roll" value="<%= student.roll %>" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Guardian Name</label><input name="guardianName" value="<%= student.guardianName %>" required></div>
+          <div class="field"><label>Guardian PIN</label><input name="guardianPin" value="<%= student.guardianPin %>" required></div>
+          <div class="field"><label>Phone</label><input name="phone" value="<%= student.phone || '' %>"></div>
+          <div class="field"><label>Update Photo</label><input type="file" name="photo" accept="image/*"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Reset Password (leave blank to keep current)</label><input type="text" name="newPassword" placeholder="Leave blank to keep unchanged"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Save Changes</button>
+        <a href="/admin/students" class="btn btn-secondary" style="width:auto;margin-left:8px;">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="/js/class-sections.js"></script>
+<script>
+  setupClassSectionSync(
+    document.getElementById('edit-class'),
+    document.getElementById('edit-section'),
+    <%- JSON.stringify(db.classSections) %>,
+    <%- JSON.stringify(student.section || '') %>
+  );
+</script>
+</body></html>

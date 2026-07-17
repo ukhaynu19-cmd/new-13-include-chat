@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Schedule</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/teacher-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Schedule</h1>
+    <div class="page-sub"><%= teacher.name %> — Subjects: <%= teacher.subjects.join(', ') || '—' %></div>
+
+    <div class="panel">
+      <% if (grid.periods.length === 0) { %>
+        <p style="color:var(--muted)">No classes assigned yet.</p>
+      <% } else { %>
+        <input
+          type="text"
+          id="schedule-search"
+          placeholder="Search subject, class, or section..."
+          style="width:100%;padding:10px;margin-bottom:14px;border-radius:8px;border:1px solid #ccc;font-size:1rem;"
+        >
+        <div style="overflow-x:auto;">
+        <table id="schedule-table" style="min-width:600px;">
+          <tr>
+  <th>Day / Period</th>
+  <% grid.periods.forEach(p => { %>
+    <th>Period <%= p %></th>
+  <% }) %>
+</tr>
+          <% grid.days.forEach(day => { %>
+          <tr>
+  <td><strong><%= day %></strong></td>
+  <% grid.periods.forEach(p => {
+       const entries = grid.byDayPeriod[day + '|' + p] || [];
+  %>
+    <td>
+  <% if (entries.length === 0) { %>
+    <span style="color:var(--muted)">—</span>
+  <% } else { %>
+    <% entries.forEach((entry, i) => { %>
+      <div style="<%= i > 0 ? 'margin-top:6px;padding-top:6px;border-top:1px dashed #ccc;' : '' %>">
+        <div style="font-size:0.78em;color:var(--muted);font-weight:600;"><%= entry.time %></div>
+        <div class="cell-subject"><%= entry.subject %></div>
+        <div style="font-size:0.82em;color:var(--muted)">
+          <%= entry.class %><%= entry.section ? ' · ' + entry.section : '' %>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</td>
+  <% }) %>
+</tr>
+          <% }) %>
+        </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+  const searchInput = document.getElementById('schedule-search');
+  if (searchInput) {
+    const cells = document.querySelectorAll('#schedule-table td:not(:first-child)');
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      cells.forEach(cell => {
+        if (!q) {
+          cell.style.background = '';
+          cell.style.opacity = '1';
+          return;
+        }
+        const match = cell.textContent.toLowerCase().includes(q);
+        cell.style.background = match ? '#fff59d' : '';
+        cell.style.opacity = match ? '1' : '0.3';
+      });
+    });
+  }
+</script>
+</body></html>

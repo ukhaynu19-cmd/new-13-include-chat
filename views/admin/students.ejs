@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Students</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Students</h1>
+    <div class="page-sub">Manage student records, login IDs, and guardian PINs</div>
+
+    <% if (typeof newId !== 'undefined' && newId) { %>
+      <div class="readonly-note">✅ Student added. Their login ID is <strong><%= newId %></strong> — give this to the student and guardian.</div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="error-msg"><%= error %></div>
+    <% } %>
+
+    <div class="panel">
+      <h3>Add New Student</h3>
+      <div class="readonly-note" style="margin-bottom:16px;">Student ID is generated automatically as <strong>HAC-YearClassRoll</strong> (e.g. HAC-20260601 = Year 2026, Class Six, Roll 01).</div>
+      <form method="POST" action="/admin/students/add" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="field"><label>Year</label><input type="number" name="year" id="add-year" value="<%= new Date().getFullYear() %>" required></div>
+          <div class="field"><label>Full Name</label><input name="name" required></div>
+          <div class="field"><label>Class</label>
+            <select name="class" id="add-class"><% db.classes.forEach(c=>{ %><option value="<%=c%>"><%=c%></option><% }) %></select>
+          </div>
+          <div class="field"><label>Section / Group</label>
+            <select name="section" id="add-section"></select>
+          </div>
+          <div class="field"><label>Roll</label><input name="roll" id="add-roll" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Generated Student ID (preview)</label><input id="id-preview" disabled></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Student Password</label><input name="password" required></div>
+          <div class="field"><label>Guardian Name</label><input name="guardianName" required></div>
+          <div class="field"><label>Guardian PIN</label><input name="guardianPin" required></div>
+          <div class="field"><label>Phone</label><input name="phone"></div>
+          <div class="field"><label>Photo</label><input type="file" name="photo" accept="image/*"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Add Student</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3>All Students (<%= db.students.length %>)</h3>
+      <table>
+        <tr><th>Photo</th><th>ID</th><th>Name</th><th>Class</th><th>Sec/Group</th><th>Roll</th><th>Guardian</th><th>Guardian PIN</th><th></th></tr>
+        <% db.students.forEach(s => { %>
+        <tr>
+          <td>
+            <% if (s.photoUrl) { %><img src="<%= s.photoUrl %>" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+            <% } else { %><span style="color:var(--muted)">—</span><% } %>
+          </td>
+          <td><%= s.id %></td><td><%= s.name %></td><td><%= s.class %></td><td><%= s.section || '—' %></td><td><%= s.roll %></td>
+          <td><%= s.guardianName %></td><td><%= s.guardianPin %></td>
+          <td>
+            <a href="/admin/students/edit/<%= s.id %>" class="btn btn-secondary" style="padding:5px 10px;font-size:0.75rem;">Edit</a>
+            <form method="POST" action="/admin/students/delete/<%= s.id %>" style="display:inline" onsubmit="return confirm('Remove this student?')">
+              <button class="btn btn-danger" style="padding:5px 10px;font-size:0.75rem;" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="/js/class-sections.js"></script>
+<script>
+  setupClassSectionSync(
+    document.getElementById('add-class'),
+    document.getElementById('add-section'),
+    <%- JSON.stringify(db.classSections) %>,
+    null
+  );
+
+  const CLASS_NUMBERS = { Six: '06', Seven: '07', Eight: '08', Nine: '09', Ten: '10' };
+  function updateIdPreview() {
+    const year = document.getElementById('add-year').value || '----';
+    const cls = document.getElementById('add-class').value;
+    const roll = document.getElementById('add-roll').value || '--';
+    const classNum = CLASS_NUMBERS[cls] || '00';
+    const rollPadded = roll.padStart(2, '0');
+    document.getElementById('id-preview').value = `HAC-${year}${classNum}${rollPadded}`;
+  }
+  document.getElementById('add-year').addEventListener('input', updateIdPreview);
+  document.getElementById('add-class').addEventListener('change', updateIdPreview);
+  document.getElementById('add-roll').addEventListener('input', updateIdPreview);
+  updateIdPreview();
+</script>
+</body></html>

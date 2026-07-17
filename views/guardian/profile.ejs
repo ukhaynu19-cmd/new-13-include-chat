@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/guardian-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Profile</h1>
+    <div class="page-sub">Guardian of <%= student.name %> (ID <%= student.id %>)</div>
+
+    <% if (message) { %><div class="readonly-note"><%= message %></div><% } %>
+    <% if (error) { %><div class="error-msg"><%= error %></div><% } %>
+
+    <div class="panel">
+      <h3>Account Details</h3>
+      <table>
+        <tr><th>Guardian Name</th><td><%= student.guardianName %></td></tr>
+        <tr><th>Phone</th><td><%= student.phone || '—' %></td></tr>
+        <tr><th>Linked Student</th><td><%= student.name %> — Class <%= student.class %><%= student.section ? ' - ' + student.section : '' %></td></tr>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>Change PIN</h3>
+      <form method="POST" action="/guardian/profile/change-pin">
+        <div class="form-row">
+          <div class="field"><label>Current PIN</label><input type="password" name="currentPin" required></div>
+          <div class="field"><label>New PIN</label><input type="password" name="newPin" required></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Update PIN</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body></html>

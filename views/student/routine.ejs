@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Class Routine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/student-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Class Routine</h1>
+    <div class="page-sub">Class <%= student.class %><%= student.section ? ' · Group ' + student.section : '' %></div>
+
+    <div class="panel">
+      <% if (grid.periods.length === 0) { %>
+        <p style="color:var(--muted)">Routine not published yet.</p>
+      <% } else { %>
+        <input
+          type="text"
+          id="routine-search"
+          placeholder="Search subject or teacher (e.g. Bangla)..."
+          style="width:100%;padding:10px;margin-bottom:14px;border-radius:8px;border:1px solid #ccc;font-size:1rem;"
+        >
+        <div style="overflow-x:auto;">
+        <table id="routine-table" style="min-width:600px;">
+          <tr>
+  <th>Day / Period</th>
+  <% grid.periods.forEach(p => { %>
+    <th>
+      Period <%= p %>
+      <% if (grid.periodTimes[p]) { %>
+        <br><span style="font-weight:normal;font-size:0.78em;color:var(--muted)"><%= grid.periodTimes[p] %></span>
+      <% } %>
+    </th>
+  <% }) %>
+</tr>
+          <% grid.days.forEach(day => { %>
+          <tr>
+  <td><strong><%= day %></strong></td>
+  <% grid.periods.forEach(p => {
+       const entries = grid.byDayPeriod[day + '|' + p] || [];
+  %>
+    <td>
+  <% if (entries.length === 0) { %>
+    <span style="color:var(--muted)">—</span>
+  <% } else { %>
+    <% entries.forEach((entry, i) => { %>
+      <div style="<%= i > 0 ? 'margin-top:6px;padding-top:6px;border-top:1px dashed #ccc;' : '' %>">
+        <div class="cell-subject"><%= entry.subject %></div>
+        <div style="font-size:0.82em;color:var(--muted)"><%= entry.teacherName %></div>
+      </div>
+    <% }) %>
+  <% } %>
+</td>
+  <% }) %>
+</tr>
+          <% }) %>
+        </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+  const searchInput = document.getElementById('routine-search');
+  if (searchInput) {
+    const cells = document.querySelectorAll('#routine-table td:not(:first-child)');
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      cells.forEach(cell => {
+        if (!q) {
+          cell.style.background = '';
+          cell.style.opacity = '1';
+          return;
+        }
+        const match = cell.textContent.toLowerCase().includes(q);
+        cell.style.background = match ? '#fff59d' : '';
+        cell.style.opacity = match ? '1' : '0.3';
+      });
+    });
+  }
+</script>
+</body></html>

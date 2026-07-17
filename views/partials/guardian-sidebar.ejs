@@ -1,0 +1,13 @@
+<div class="sidebar">
+  <div class="brand">Hill Academic Care<span class="role-tag">Guardian</span></div>
+  <a class="nav-link <%= page==='dashboard'?'active':'' %>" href="/guardian">📊 Dashboard</a>
+  <a class="nav-link <%= page==='attendance'?'active':'' %>" href="/guardian/attendance">🗓️ Attendance</a>
+  <a class="nav-link <%= page==='routine'?'active':'' %>" href="/guardian/routine">📚 Class Routine</a>
+  <a class="nav-link <%= page==='exams'?'active':'' %>" href="/guardian/exams">📝 Exam Routine</a>
+  <a class="nav-link <%= page==='results'?'active':'' %>" href="/guardian/results">🏆 Results</a>
+  <a class="nav-link <%= page==='fees'?'active':'' %>" href="/guardian/fees">💵 Fees</a>
+  <a class="nav-link <%= page==='profile'?'active':'' %>" href="/guardian/profile">🔑 My Profile</a>
+  <div class="nav-spacer"></div>
+  <a href="<%= whatsappLink %>" target="_blank" rel="noopener" class="sidebar-whatsapp">💬 WhatsApp Support</a>
+  <a class="nav-link logout-link" href="/logout">↩️ Logout</a>
+</div>

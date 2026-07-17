@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Edit Result</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Edit Result</h1>
+    <div class="panel">
+      <form method="POST" action="/admin/results/edit/<%= entry._id %>">
+        <div class="form-row">
+          <div class="field"><label>Class</label>
+            <select id="rese-class">
+              <% db.classes.forEach(c=>{ %><option value="<%= c %>"><%= c %></option><% }) %>
+            </select>
+          </div>
+          <div class="field"><label>Student</label>
+            <select name="studentId" id="rese-student"></select>
+          </div>
+          <div class="field"><label>Exam Name</label><input name="examName" value="<%= entry.examName %>" required></div>
+          <div class="field"><label>Subject</label><input name="subject" value="<%= entry.subject %>" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Full Marks</label><input type="number" name="fullMarks" value="<%= entry.fullMarks %>" required></div>
+          <div class="field"><label>Obtained</label><input type="number" name="obtained" value="<%= entry.obtained %>" required></div>
+          <div class="field"><label>Publish Date</label><input type="date" name="publishDate" value="<%= entry.publishDate || '' %>"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Save Changes</button>
+        <a href="/admin/results" class="btn btn-secondary" style="width:auto;margin-left:8px;">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="/js/class-students.js"></script>
+<script>
+  const resStudents = <%- JSON.stringify(db.students.map(s => ({ id: s.id, name: s.name, class: s.class, section: s.section }))) %>;
+  const resCurrentStudent = resStudents.find(s => s.id === <%- JSON.stringify(entry.studentId) %>);
+  document.getElementById('rese-class').value = resCurrentStudent ? resCurrentStudent.class : document.getElementById('rese-class').value;
+  setupClassStudentSync(
+    document.getElementById('rese-class'),
+    document.getElementById('rese-student'),
+    resStudents,
+    <%- JSON.stringify(entry.studentId) %>
+  );
+</script>
+</body></html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Edit Teacher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Edit Teacher</h1>
+    <div class="page-sub">Teacher ID <%= teacher.id %> (ID cannot be changed)</div>
+
+    <div class="panel">
+      <% if (teacher.photoUrl) { %>
+        <img src="<%= teacher.photoUrl %>" style="width:70px;height:70px;border-radius:50%;object-fit:cover;margin-bottom:16px;">
+      <% } %>
+      <form method="POST" action="/admin/teachers/edit/<%= teacher.id %>" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="field"><label>Full Name</label><input name="name" value="<%= teacher.name %>" required></div>
+          <div class="field"><label>Subjects (comma-separated)</label><input name="subjects" value="<%= teacher.subjects.join(', ') %>" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Phone</label><input name="phone" value="<%= teacher.phone || '' %>"></div>
+          <div class="field"><label>Update Photo</label><input type="file" name="photo" accept="image/*"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Reset Password (leave blank to keep current)</label><input type="text" name="newPassword" placeholder="Leave blank to keep unchanged"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Save Changes</button>
+        <a href="/admin/teachers" class="btn btn-secondary" style="width:auto;margin-left:8px;">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/guardian-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">My Attendance</h1>
+    <div class="page-sub"><%= student.name %> — Class <%= student.class %><%= student.section ? ' - ' + student.section : '' %></div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Overall %</div><div class="value"><%= attendance.percent %>%</div></div>
+      <div class="stat-card"><div class="label">Present Days</div><div class="value"><%= attendance.present %></div></div>
+      <div class="stat-card"><div class="label">Absent Days</div><div class="value clay"><%= attendance.absent %></div></div>
+    </div>
+
+    <div class="panel">
+      <h3>Attendance Log</h3>
+      <table>
+        <tr><th>Date</th><th>Status</th></tr>
+        <% attendance.records.slice().reverse().forEach(r => { %>
+        <tr>
+          <td><%= r.date %></td>
+          <td><span class="badge badge-<%= r.status==='Present'?'present':(r.status==='Absent'?'absent':'none') %>"><%= r.status %></span></td>
+        </tr>
+        <% }) %>
+      </table>
+    </div>
+  </div>
+</div>
+</body></html>

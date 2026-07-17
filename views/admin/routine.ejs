@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Class Routine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Class Routine</h1>
+    <div class="page-sub">Set the weekly class schedule per class/section</div>
+
+    <div class="panel">
+      <h3>Add Routine Entry</h3>
+      <form method="POST" action="/admin/routine/add">
+        <div class="form-row">
+          <div class="field" style="flex:1 1 100%;">
+  <label>Apply to Class/Section(s)</label>
+  <p style="font-size:0.85em;color:var(--muted);margin:2px 0 8px;">
+    Tick every class or section that shares this exact period — e.g. a combined Class 9 & 10 slot — to add them all at once.
+  </p>
+  <div style="max-height:160px;overflow-y:auto;border:1px solid #ccc;border-radius:8px;padding:8px;">
+    <% db.classSectionCombos.forEach(c => { %>
+      <label style="display:block;padding:3px 0;">
+        <input type="checkbox" name="targets" value="<%= c.class %>|<%= c.section %>">
+        <%= c.label %>
+      </label>
+    <% }) %>
+  </div>
+</div>
+          <div class="field"><label>Day</label>
+            <select name="day">
+              <% dayOrder.forEach(d=>{ %><option><%=d%></option><% }) %>
+            </select>
+          </div>
+          <div class="field"><label>Period</label><input name="period" placeholder="1" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Time</label><input name="time" placeholder="9:00-9:45" required></div>
+          <div class="field"><label>Subject</label><input name="subject" required></div>
+          <div class="field"><label>Teacher</label>
+            <select name="teacherId" required>
+              <option value="">Select teacher</option>
+              <% (db.teachers || []).forEach(t=>{ %><option value="<%= t.id %>"><%= t.name %> (<%= t.subjects.join(', ') %>)</option><% }) %>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Add to Routine</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3>Current Routine</h3>
+      <table>
+        <tr><th>Class</th><th>Sec/Group</th><th>Day</th><th>Period</th><th>Time</th><th>Subject</th><th>Teacher</th><th></th></tr>
+        <% db.routines.forEach((r,i) => { %>
+        <tr>
+          <td><%= r.class %></td><td><%= r.section || '—' %></td><td><%= r.day %></td><td><%= r.period %></td>
+          <td><%= r.time %></td><td><%= r.subject %></td><td><%= r.teacherName || r.teacher %></td>
+          <td>
+            <a href="/admin/routine/edit/<%= r._id %>" class="btn btn-secondary" style="padding:5px 10px;font-size:0.75rem;">Edit</a>
+            <form method="POST" action="/admin/routine/delete/<%= r._id %>" style="display:inline">
+              <button class="btn btn-danger" style="padding:5px 10px;font-size:0.75rem;" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="/js/class-sections.js"></script>
+<script>
+  setupClassSectionSync(
+    document.getElementById('rt-class'),
+    document.getElementById('rt-section'),
+    <%- JSON.stringify(db.classSections) %>,
+    null
+  );
+</script>
+</body></html>

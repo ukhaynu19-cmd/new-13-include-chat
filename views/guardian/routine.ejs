@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Class Routine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/guardian-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Class Routine</h1>
+    <div class="page-sub">Class <%= student.class %><%= student.section ? ' · Group ' + student.section : '' %></div>
+
+    <div class="panel">
+      <% if (routine.length === 0) { %><p style="color:var(--muted)">Routine not published yet.</p><% } else { %>
+      <table>
+        <tr><th>Day</th><th>Period</th><th>Time</th><th>Subject</th><th>Teacher</th></tr>
+        <% routine.forEach(r => { %>
+        <tr><td><%= r.day %></td><td><%= r.period %></td><td><%= r.time %></td><td><%= r.subject %></td><td><%= r.teacher %></td></tr>
+        <% }) %>
+      </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+</body></html>

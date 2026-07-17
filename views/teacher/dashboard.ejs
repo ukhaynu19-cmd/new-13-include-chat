@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Teacher Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/teacher-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Welcome, <%= teacher.name %></h1>
+    <div class="page-sub">Teacher ID <%= teacher.id %></div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Subjects</div><div class="value" style="font-size:1.1rem;"><%= teacher.subjects.join(', ') || '—' %></div></div>
+      <div class="stat-card"><div class="label">Classes Taught / Week</div><div class="value"><%= schedule.length %></div></div>
+    </div>
+
+    <div class="panel">
+      <h3>My Class Schedule</h3>
+      <% if (grid.periods.length === 0) { %>
+        <p style="color:var(--muted)">No classes assigned yet. Contact the admin.</p>
+      <% } else { %>
+        <div style="overflow-x:auto;">
+        <table style="min-width:600px;">
+          <tr>
+            <th>Day / Period</th>
+            <% grid.periods.forEach(p => { %><th>Period <%= p %></th><% }) %>
+          </tr>
+          <% grid.days.forEach(day => { %>
+          <tr>
+            <td><strong><%= day %></strong></td>
+            <% grid.periods.forEach(p => {
+                 const entries = grid.byDayPeriod[day + '|' + p] || [];
+            %>
+              <td>
+  <% if (entries.length === 0) { %>
+    <span style="color:var(--muted)">—</span>
+  <% } else { %>
+    <% entries.forEach((entry, i) => { %>
+      <div style="<%= i > 0 ? 'margin-top:6px;padding-top:6px;border-top:1px dashed #ccc;' : '' %>">
+        <div style="font-size:0.78em;color:var(--muted);font-weight:600;"><%= entry.time %></div>
+        <div class="cell-subject"><%= entry.subject %></div>
+        <div style="font-size:0.8em;color:var(--muted)">
+          <%= entry.class %><%= entry.section ? ' · ' + entry.section : '' %>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</td>
+            <% }) %>
+          </tr>
+          <% }) %>
+        </table>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="panel">
+      <h3>Quick Actions</h3>
+      <a href="/teacher/attendance" class="btn btn-primary" style="width:auto;display:inline-block;">Take Attendance</a>
+      <a href="/teacher/schedule" class="btn btn-secondary" style="width:auto;display:inline-block;margin-left:8px;">Full Schedule</a>
+    </div>
+  </div>
+</div>
+</body></html>

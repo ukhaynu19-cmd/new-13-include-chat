@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Teachers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Teachers</h1>
+    <div class="page-sub">Manage teacher records, subjects, and login</div>
+
+    <div class="panel">
+      <h3>Add New Teacher</h3>
+      <form method="POST" action="/admin/teachers/add" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="field"><label>Teacher ID</label><input name="id" placeholder="T004" required></div>
+          <div class="field"><label>Full Name</label><input name="name" required></div>
+          <div class="field"><label>Password</label><input name="password" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Subjects (comma-separated)</label><input name="subjects" placeholder="Math, Science" required></div>
+          <div class="field"><label>Phone</label><input name="phone"></div>
+          <div class="field"><label>Photo</label><input type="file" name="photo" accept="image/*"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;" type="submit">Add Teacher</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3>All Teachers (<%= (db.teachers || []).length %>)</h3>
+      <table>
+        <tr><th>Photo</th><th>ID</th><th>Name</th><th>Subjects</th><th>Phone</th><th></th></tr>
+        <% (db.teachers || []).forEach(t => { %>
+        <tr>
+          <td>
+            <% if (t.photoUrl) { %><img src="<%= t.photoUrl %>" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+            <% } else { %><span style="color:var(--muted)">—</span><% } %>
+          </td>
+          <td><%= t.id %></td><td><%= t.name %></td><td><%= t.subjects.join(', ') %></td><td><%= t.phone || '—' %></td>
+          <td>
+            <a href="/admin/teachers/edit/<%= t.id %>" class="btn btn-secondary" style="padding:5px 10px;font-size:0.75rem;">Edit</a>
+            <form method="POST" action="/admin/teachers/delete/<%= t.id %>" style="display:inline" onsubmit="return confirm('Remove this teacher?')">
+              <button class="btn btn-danger" style="padding:5px 10px;font-size:0.75rem;" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </table>
+    </div>
+  </div>
+</div>
+</body></html>

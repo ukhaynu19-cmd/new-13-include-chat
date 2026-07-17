@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Fees</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Fee Management</h1>
+    <div class="page-sub">Track monthly fees per student</div>
+
+    <div class="panel">
+      <h3>Add Fee Record</h3>
+      <div class="readonly-note" style="margin-bottom:16px;">Pick a class first to narrow down the student list. Each student can only have one fee record per month — adding the same student + month again updates the existing record instead of duplicating it.</div>
+      <form method="POST" action="/admin/fees/add">
+        <div class="form-row">
+          <div class="field"><label>Class</label>
+            <select id="fee-class">
+              <% db.classes.forEach(c=>{ %><option value="<%= c %>"><%= c %></option><% }) %>
+            </select>
+          </div>
+          <div class="field"><label>Student</label>
+            <select name="studentId" id="fee-student"></select>
+          </div>
+          <div class="field"><label>Month</label>
+            <select name="monthName">
+              <% ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach(m=>{ %><option><%= m %></option><% }) %>
+            </select>
+          </div>
+          <div class="field"><label>Year</label><input type="number" name="year" value="<%= new Date().getFullYear() %>" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Amount</label><input type="number" name="amount" min="0" step="0.01" required></div>
+<div class="field"><label>Paid Amount</label><input type="number" name="paidAmount" min="0" step="0.01" value="0"></div>
+<div class="field"><label>Status</label>
+  <select name="status">
+    <option value="">Auto (based on paid amount)</option>
+    <option value="Unpaid">Unpaid</option>
+    <option value="Partial">Partial</option>
+    <option value="Paid">Paid</option>
+  </select>
+</div>
+        </div>
+        <button type="submit" class="btn-primary">Save Fee Record</button>
+      </form>
+    </div>
+<div class="form-row" style="margin-bottom:14px;">
+  
+  <div class="field" style="max-width:200px;">
+    <label>Filter Status</label>
+    <select id="fee-status-filter">
+      <option value="">All</option>
+      <option value="Unpaid">Unpaid</option>
+      <option value="Partial">Partial</option>
+      <option value="Paid">Paid</option>
+    </select>
+  </div>
+</div>
+    <div class="panel">
+      <h3>Fee Records</h3>
+      <% if (!db.fees || db.fees.length === 0) { %>
+        <div class="readonly-note">No fee records yet.</div>
+      <% } else { %>
+      <div class="field" style="max-width:360px; margin-bottom:14px;">
+        <label>Search Student</label>
+        <input type="text" id="fee-search" placeholder="Search by name or student ID..." autocomplete="off">
+      </div>
+      <div id="fee-no-results" class="readonly-note" style="display:none;">No fee records found.</div>
+      <table class="data-table" id="fee-table">
+        <thead>
+  <tr>
+    <th>Student</th>
+    <th>Class</th>
+    <th>Month</th>
+    <th>Amount</th>
+    <th>Paid</th>
+    <th>Status</th>
+    <th>Paid Date</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+        <tbody id="fee-table-body">
+          <% db.fees.forEach(fee=>{
+               const student = db.students.find(s=>s.id===fee.studentId);
+          %>
+          <tr data-name="<%= (student ? student.name : '').toLowerCase() %>" data-id="<%= fee.studentId.toLowerCase() %>" data-status="<%= fee.status %>">
+  <td><%= student ? student.name : fee.studentId %><div style="font-size:12px;color:#888;"><%= fee.studentId %></div></td>
+  <td><%= student ? student.class : '' %></td>
+  <td><%= fee.month %></td>
+  <td><%= fee.amount %></td>
+  <td><%= fee.paidAmount || 0 %></td>
+  <td>
+    <span class="badge <%= fee.status==='Paid' ? 'badge-success' : (fee.status==='Partial' ? 'badge-warning' : 'badge-danger') %>">
+      <%= fee.status %>
+    </span>
+  </td>
+  <td><%= fee.paidDate || '-' %></td>
+  <td class="actions-cell">
+    <a href="/admin/fees/edit/<%= fee._id %>" class="btn-small">Edit</a>
+    <form method="POST" action="/admin/fees/delete/<%= fee._id %>" style="display:inline;" onsubmit="return confirm('Delete this fee record?');">
+      <button type="submit" class="btn-small btn-danger">Delete</button>
+    </form>
+  </td>
+</tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+  const allStudents = <%- JSON.stringify(db.students) %>;
+
+  function setupClassStudentSync(classEl, studentEl, students, currentStudentId) {
+    function refresh() {
+      const selectedClass = classEl.value;
+      const filtered = students.filter(s => s.class === selectedClass);
+      studentEl.innerHTML = '';
+      filtered.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name + ' (' + s.id + ')';
+        if (currentStudentId && s.id === currentStudentId) opt.selected = true;
+        studentEl.appendChild(opt);
+      });
+      if (filtered.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'No students in this class';
+        studentEl.appendChild(opt);
+      }
+    }
+    classEl.addEventListener('change', refresh);
+    refresh();
+  }
+
+  setupClassStudentSync(
+    document.getElementById('fee-class'),
+    document.getElementById('fee-student'),
+    allStudents,
+    null
+  );
+
+  // Search + status filter (declared in the right order now)
+  const feeSearchInput = document.getElementById('fee-search');
+  const statusFilter = document.getElementById('fee-status-filter');
+
+  if (feeSearchInput) {
+    const feeTableBody = document.getElementById('fee-table-body');
+    const feeNoResults = document.getElementById('fee-no-results');
+    const feeTable = document.getElementById('fee-table');
+    const feeRows = Array.from(feeTableBody.querySelectorAll('tr'));
+
+    function applyFilters() {
+      const q = feeSearchInput.value.trim().toLowerCase();
+      const statusQ = statusFilter ? statusFilter.value : '';
+      let visibleCount = 0;
+      feeRows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const id = row.getAttribute('data-id') || '';
+        const status = row.getAttribute('data-status') || '';
+        const matchesSearch = !q || name.includes(q) || id.includes(q);
+        const matchesStatus = !statusQ || status === statusQ;
+        const show = matchesSearch && matchesStatus;
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+      feeNoResults.style.display = visibleCount === 0 ? '' : 'none';
+      feeTable.style.display = visibleCount === 0 ? 'none' : '';
+    }
+
+    feeSearchInput.addEventListener('input', applyFilters);
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+  }
+</script>
+</body>
+</html>

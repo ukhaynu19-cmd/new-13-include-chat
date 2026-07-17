@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>My Fees</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/guardian-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Fee Status</h1>
+    <div class="page-sub"><%= student.name %> — Class <%= student.class %><%= student.section ? ' - ' + student.section : '' %></div>
+
+    <div class="panel">
+      <% if (fees.length === 0) { %><p style="color:var(--muted)">No fee records yet.</p><% } else { %>
+      <table>
+        <tr><th>Month</th><th>Amount</th><th>Status</th><th>Paid Date</th></tr>
+        <% fees.forEach(f => { %>
+        <tr>
+          <td><%= f.month %></td><td>৳<%= f.amount %></td>
+          <td><span class="badge badge-<%= f.status==='Paid'?'paid':'due' %>"><%= f.status %></span></td>
+          <td><%= f.paidDate || '—' %></td>
+        </tr>
+        <% }) %>
+      </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+</body></html>

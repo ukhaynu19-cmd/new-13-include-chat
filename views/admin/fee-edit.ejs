@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Edit Fee Record</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/admin-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Edit Fee Record</h1>
+    <div class="panel">
+      <form method="POST" action="/admin/fees/edit/<%= entry._id %>">
+        <div class="form-row">
+          <div class="field"><label>Class</label>
+            <select id="fee-class">
+              <% db.classes.forEach(c=>{ %><option value="<%= c %>"><%= c %></option><% }) %>
+            </select>
+          </div>
+          <div class="field"><label>Student</label>
+            <select name="studentId" id="fee-student"></select>
+          </div>
+          <div class="field"><label>Month</label>
+            <select name="monthName">
+              <% ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach(m=>{ %><option <%= m===entryMonthName?'selected':'' %>><%= m %></option><% }) %>
+            </select>
+          </div>
+          <div class="field"><label>Year</label><input type="number" name="year" value="<%= entryYear %>" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Amount</label><input type="number" name="amount" min="0" step="0.01" value="<%= entry.amount %>" required></div>
+<div class="field"><label>Paid Amount</label><input type="number" name="paidAmount" min="0" step="0.01" value="<%= entry.paidAmount || 0 %>"></div>
+<div class="field"><label>Status</label>
+  <select name="status">
+    <option value="Unpaid" <%= entry.status==='Unpaid' ? 'selected' : '' %>>Unpaid</option>
+    <option value="Partial" <%= entry.status==='Partial' ? 'selected' : '' %>>Partial</option>
+    <option value="Paid" <%= entry.status==='Paid' ? 'selected' : '' %>>Paid</option>
+  </select>
+</div>
+        </div>
+        <button type="submit" class="btn-primary">Update Fee Record</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const allStudents = <%- JSON.stringify(db.students) %>;
+  const currentStudentId = <%- JSON.stringify(entry.studentId) %>;
+  const currentStudent = allStudents.find(s => s.id === currentStudentId);
+
+  function setupClassStudentSync(classEl, studentEl, students, currentStudentId) {
+    function refresh() {
+      const selectedClass = classEl.value;
+      const filtered = students.filter(s => s.class === selectedClass);
+
+      studentEl.innerHTML = '';
+      filtered.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name + ' (' + s.id + ')';
+        if (currentStudentId && s.id === currentStudentId) opt.selected = true;
+        studentEl.appendChild(opt);
+      });
+
+      if (filtered.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'No students in this class';
+        studentEl.appendChild(opt);
+      }
+    }
+
+    classEl.addEventListener('change', refresh);
+    refresh();
+  }
+
+  const classEl = document.getElementById('fee-class');
+  if (currentStudent) {
+    classEl.value = currentStudent.class;
+  }
+
+  setupClassStudentSync(
+    classEl,
+    document.getElementById('fee-student'),
+    allStudents,
+    currentStudentId
+  );
+</script>
+</body>
+</html>

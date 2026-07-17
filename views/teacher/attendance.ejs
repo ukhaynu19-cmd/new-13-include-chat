@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Take Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="app">
+  <%- include('../partials/teacher-sidebar', { page }) %>
+  <div class="main">
+    <h1 class="page-title">Take Attendance</h1>
+    <div class="page-sub"><%= date %></div>
+
+    <div class="panel">
+      <form method="GET" action="/teacher/attendance" class="form-row">
+        <div class="field">
+          <label>Class</label>
+          <select name="class" id="att-class">
+            <% classes.forEach(c => { %><option <%= c===selectedClass?'selected':'' %>><%= c %></option><% }) %>
+          </select>
+        </div>
+        <div class="field">
+          <label>Section</label>
+          <select name="section" id="att-section">
+            <option value="">All</option>
+            <% availableSections.forEach(s => { %><option value="<%= s %>" <%= s===selectedSection?'selected':'' %>><%= s %></option><% }) %>
+          </select>
+        </div>
+        <div class="field"><label>Date</label><input type="date" name="date" value="<%= date %>"></div>
+        <button class="btn btn-secondary" style="width:auto;align-self:flex-end;" type="submit">Load</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <% if (students.length === 0) { %>
+        <p style="color:var(--muted)">No students found for this class/section.</p>
+      <% } else { %>
+      <form method="POST" action="/teacher/attendance/save">
+        <input type="hidden" name="date" value="<%= date %>">
+        <input type="hidden" name="class" value="<%= selectedClass %>">
+        <input type="hidden" name="section" value="<%= selectedSection %>">
+        <table>
+          <tr><th>Student</th><th>Roll</th><th>Status</th></tr>
+          <% students.forEach(s => {
+               const rec = existing[s.id];
+          %>
+          <tr>
+            <td><%= s.name %> (<%= s.id %>)</td>
+            <td><%= s.roll %></td>
+            <td>
+              <% if (rec) { %>
+                <span class="badge <%= rec.status==='Present' ? 'badge-success' : 'badge-danger' %>"><%= rec.status %></span>
+              <% } else { %>
+                <input type="hidden" name="studentIds" value="<%= s.id %>">
+                <select name="statuses">
+                  <option value="Present">Present</option>
+                  <option value="Absent">Absent</option>
+                </select>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </table>
+        <button class="btn btn-primary" style="width:auto;margin-top:14px;" type="submit">Save Attendance</button>
+      </form>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script src="/js/class-sections.js"></script>
+<script>
+  document.getElementById('att-class').addEventListener('change', function() {
+    document.querySelector('form[action="/teacher/attendance"]').submit();
+  });
+</script>
+</body></html>
